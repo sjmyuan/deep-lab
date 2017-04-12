@@ -5,8 +5,9 @@ scalaVersion := "2.11.2"
 val scalazVersion = "7.1.0"
 
 libraryDependencies ++= Seq(
-  "com.github.thangiee" %% "freasy-monad" % "0.5.0",
-  "org.typelevel" %% "cats" % "0.9.0"
+  "org.typelevel" %% "cats" % "0.9.0",
+  "org.scalactic" %% "scalactic" % "3.0.1",
+  "org.scalatest" %% "scalatest" % "3.0.1" % "test"
 )
 
 scalacOptions += "-feature"
