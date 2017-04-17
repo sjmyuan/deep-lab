@@ -23,6 +23,8 @@ trait Ops[A] {
   def zero(): A
 
   def one(): A
+
+  def ==(lv: A, rv: A): Boolean
 }
 
 class DoubleOps extends Ops[Double] {
@@ -43,6 +45,8 @@ class DoubleOps extends Ops[Double] {
   override def *(lv: Double, rv: Double): Double = lv * rv
 
   override def zero(): Double = 0.0
+
+  override def ==(lv: Double, rv: Double): Boolean = lv == rv
 }
 
 object Ops {
