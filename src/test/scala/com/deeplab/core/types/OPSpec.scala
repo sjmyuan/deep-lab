@@ -4,6 +4,7 @@ import org.scalatest.FunSpec
 import Ops._
 import Variable._
 import EXPR._
+import Inject._
 /**
   * Created by jiaming.shang on 4/12/17.
   */
@@ -11,7 +12,7 @@ class OPSpec extends FunSpec {
   describe("An OP") {
     describe("VAL") {
       it("should return the constant value"){
-        val expr = valExpr[EXPRTYPE](10)
+        val expr:EXPR[EXPRTYPE] = valExpr[EXPRTYPE](10)
         val value = fold[EXPRTYPE,Int](expr){x:EXPRTYPE[Int] => 1}
         assert(value == 10)
       }
