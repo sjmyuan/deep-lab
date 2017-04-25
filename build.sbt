@@ -15,5 +15,6 @@ libraryDependencies ++= Seq(
 )
 
 scalacOptions += "-feature"
+scalacOptions += "-language:higherKinds"
 
 initialCommands in console := "import cats._, data._, implicits._"

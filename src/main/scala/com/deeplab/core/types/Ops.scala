@@ -1,6 +1,6 @@
 package com.deeplab.core.types
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
+import cats.data.Coproduct
 
 /**
   * Created by jiaming.shang on 4/14/17.

@@ -3,21 +3,29 @@ package com.deeplab.core.types
 import org.scalatest.FunSpec
 import Ops._
 import Variable._
-
+import EXPR._
 /**
   * Created by jiaming.shang on 4/12/17.
   */
 class OPSpec extends FunSpec {
   describe("An OP") {
-    describe("eval[Double]") {
-      describe("when is ADD") {
-        it("should return the sum of two number") {
-          val sum = ADD(CONS("", 1.0), CONS("", 1.0))
-          val f = SYMBOL.eval[Double](sum)
-          assert(f(1.0).v == 2.0)
-        }
+    describe("VAL") {
+      it("should return the constant value"){
+        val expr = valExpr[EXPRTYPE](10)
+        val value = fold[EXPRTYPE,Int](expr){x:EXPRTYPE[Int] => 1}
+        assert(value == 10)
       }
     }
+//  describe("An OP") {
+//    describe("eval[Double]") {
+//      describe("when is ADD") {
+//        it("should return the sum of two number") {
+//          val sum = ADD(CONS("", 1.0), CONS("", 1.0))
+//          val f = SYMBOL.eval[Double](sum)
+//          assert(f(1.0).v == 2.0)
+//        }
+//      }
+//    }
 //    describe("derivate") {
 //      describe("when is ADD") {
 //        it("should return the sum of derivate") {
