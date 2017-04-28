@@ -5,6 +5,7 @@ import Ops._
 import Variable._
 import EXPR._
 import Inject._
+import cats.implicits._
 /**
   * Created by jiaming.shang on 4/12/17.
   */

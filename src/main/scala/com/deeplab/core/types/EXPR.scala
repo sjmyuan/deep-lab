@@ -2,8 +2,7 @@ package com.deeplab.core.types
 
 import cats.Functor
 import cats.data.Coproduct
-import cats.free.Inject
-
+import cats.implicits._
 /**
   * Created by jiaming.shang on 4/24/17.
   */
@@ -26,8 +25,9 @@ case class LOG[A](v: A)
 case class EXP[A](v: A)
 
 object EXPR {
-//  type EXPRTYPE[A] = Coproduct[VAL, Coproduct[ADD, SUB, ?], A]
-  type EXPRTYPE[A] = Coproduct[ADD, VAL, A]
+  type EXPRTYPE[A] = Coproduct[MUL, Coproduct[VAL, Coproduct[ADD, SUB, ?], ?], A]
+  //  type EXPRTYPE[A] = Coproduct[ADD, VAL, A]
+
 
   implicit def valFunctor = new Functor[VAL] {
     override def map[A, B](fa: VAL[A])(f: (A) => B): VAL[B] = {

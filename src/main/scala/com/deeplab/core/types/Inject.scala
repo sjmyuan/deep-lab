@@ -20,7 +20,31 @@ object Inject {
     def inj[A](sub: F[A]): Coproduct[F, G, A] = leftc[F, G, A](sub)
   }
 
-  implicit def leftKnown3Inject[F[_] : Functor, G[_] : Functor, H[_] : Functor](implicit I: Inject[F, G]): Inject[F, Coproduct[H, G, ?]] = new Inject[F, Coproduct[H, G, ?]] {
+  implicit def leftKnown3Inject[F[_] : Functor, G[_] : Functor, H[_] : Functor]: Inject[F, Coproduct[F, Coproduct[G, H, ?], ?]] = new Inject[F, Coproduct[F, Coproduct[G, H, ?], ?]] {
+    def inj[A](sub: F[A]): Coproduct[F, Coproduct[G, H, ?], A] = leftc[F, Coproduct[G, H, ?], A](sub)
+  }
+
+  implicit def larger2Inject[
+  F[_] : Functor,
+  G[_] : Functor,
+  H[_] : Functor,
+  J[_] : Functor](implicit I:Inject[F,G]): Inject[F, Coproduct[H, Coproduct[G, J, ?], ?]] =
+    new Inject[F, Coproduct[H, Coproduct[G, J, ?], ?]] {
+      def inj[A](sub: F[A]): Coproduct[H, Coproduct[G, J, ?], A] =
+        rightc[H,Coproduct[G,J,?],A](leftc[G,J,A](I.inj(sub)))
+    }
+
+  implicit def larger3Inject[
+  F[_] : Functor,
+  G[_] : Functor,
+  H[_] : Functor,
+  J[_] : Functor](implicit I:Inject[F,J]): Inject[F, Coproduct[H, Coproduct[G, J, ?], ?]] =
+    new Inject[F, Coproduct[H, Coproduct[G, J, ?], ?]] {
+      def inj[A](sub: F[A]): Coproduct[H, Coproduct[G, J, ?], A] =
+        rightc[H,Coproduct[G,J,?],A](rightc[G,J,A](I.inj(sub)))
+    }
+
+  implicit def rightKnowInject[F[_] : Functor, G[_] : Functor, H[_] : Functor](implicit I: Inject[F, G]): Inject[F, Coproduct[H, G, ?]] = new Inject[F, Coproduct[H, G, ?]] {
     def inj[A](sub: F[A]): Coproduct[H, G, A] = rightc[H, G, A](I.inj(sub))
   }
 }
