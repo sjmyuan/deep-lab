@@ -31,5 +31,6 @@ libraryDependencies ++= (scalaBinaryVersion.value match {
 
 scalacOptions += "-feature"
 scalacOptions += "-language:higherKinds"
+scalacOptions += "-language:implicitConversions"
 
 initialCommands in console := "import cats._, data._, implicits._"

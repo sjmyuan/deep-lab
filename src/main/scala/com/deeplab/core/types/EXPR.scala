@@ -89,8 +89,8 @@ object EXPR {
     EXPR[F](I.inj(v))
   }
 
-  def valExpr[F[_]](v: Int)(implicit I: Inject[VAL, F]): EXPR[F] = {
-    inject[VAL, F](VAL(v))
+  def valX(v: Int): EXPR[EXPRTYPE] = {
+    inject[VAL, EXPRTYPE](VAL(v))
   }
 
   def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F]): EXPR[F] = {
@@ -124,6 +124,10 @@ object EXPR {
   def fold[F[_] : Functor, A](fa: EXPR[F])(f: F[A] => A): A = {
     val functorA = implicitly[Functor[F]]
     f(functorA.map(fa.v) { x => fold(x)(f) })
+  }
+
+  implicit def EXPRToWrapper[F[_]](v: EXPR[F]): EXPRWrapper[F] = {
+    EXPRWrapper(v)
   }
 }
 

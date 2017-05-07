@@ -4,15 +4,41 @@ import org.scalatest.FunSpec
 import Ops._
 import Variable._
 import EXPR._
+import cats.data.Coproduct
 import cats.implicits._
+
 /**
   * Created by jiaming.shang on 4/12/17.
   */
 class OPSpec extends FunSpec {
   describe("An OP") {
+
+    describe("Expression") {
+      describe("Add"){
+        it("should return the right add expression"){
+          val expr1= valX(10)
+          val expr2= valX(10)
+          val result = expr1 + expr2
+          val expected = addExpr(expr1,expr2)
+
+          assert(result.v == expected)
+        }
+
+        it("should return the wrong add expression"){
+          val expr1= valX(10)
+          val expr2= valX(10)
+          val expr3= valX(11)
+          val result = expr1 + expr2
+          val expected = addExpr(expr1,expr3)
+
+          assert(result.v != expected)
+        }
+      }
+    }
+
     describe("VAL") {
       it("should return the constant value"){
-        val expr:EXPR[EXPRTYPE] = valExpr[EXPRTYPE](10)
+        val expr= valX(10)
         val value = fold[EXPRTYPE,Int](expr){x:EXPRTYPE[Int] => 1}
         assert(value == 1)
       }
