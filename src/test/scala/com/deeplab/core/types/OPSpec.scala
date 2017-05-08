@@ -6,6 +6,7 @@ import Variable._
 import EXPR._
 import cats.data.Coproduct
 import cats.implicits._
+import EVAL._
 
 /**
   * Created by jiaming.shang on 4/12/17.
@@ -36,11 +37,47 @@ class OPSpec extends FunSpec {
       }
     }
 
-    describe("VAL") {
-      it("should return the constant value"){
-        val expr= valX(10)
-        val value = fold[EXPRTYPE,Int](expr){x:EXPRTYPE[Int] => 1}
-        assert(value == 1)
+    describe("EVAL"){
+      describe("VAL") {
+        it("should return the constant value"){
+          val expr= valX(10)
+          val realExpr = eval(expr)
+          val result = realExpr(Map())
+          assert(result == 10)
+        }
+      }
+
+      describe("VAR") {
+        it("should return the variable value"){
+          val expr= varX("x")
+          val realExpr = eval(expr)
+          val result = realExpr(Map("x"->10))
+          assert(result == 10)
+        }
+      }
+
+      describe("ADD") {
+        describe("two var"){
+          it("should return the sum variable value"){
+            val x= varX("x")
+            val y= varX("y")
+            val expr=x+y
+            val realExpr = eval(expr)
+            val result = realExpr(Map("x"->10,"y"->20))
+            assert(result == 30)
+          }
+        }
+
+        describe("two val"){
+          it("should return the sum const value"){
+            val x= valX(10)
+            val y= valX(20)
+            val expr=x+y
+            val realExpr = eval(expr)
+            val result = realExpr(Map())
+            assert(result == 30)
+          }
+        }
       }
     }
 //  describe("An OP") {

@@ -11,7 +11,9 @@ import cats.implicits._
   */
 case class EXPR[F[_]](v: F[EXPR[F]])
 
-case class VAL[A](v: Int)
+case class VAL[A](v: Int,name:String)
+
+case class VAR[A](name:String)
 
 case class ADD[A](lv: A, rv: A)
 
@@ -34,12 +36,19 @@ object EXPR {
   type EXPRTYPE4[A] = Coproduct[DIV, EXPRTYPE3, A]
   type EXPRTYPE5[A] = Coproduct[POW, EXPRTYPE4, A]
   type EXPRTYPE6[A] = Coproduct[LOG, EXPRTYPE5, A]
-  type EXPRTYPE[A] = Coproduct[EXP, EXPRTYPE6, A]
+  type EXPRTYPE7[A] = Coproduct[VAR, EXPRTYPE6, A]
+  type EXPRTYPE[A] = Coproduct[EXP, EXPRTYPE7, A]
 
 
   implicit def valFunctor = new Functor[VAL] {
     override def map[A, B](fa: VAL[A])(f: (A) => B): VAL[B] = {
-      VAL[B](fa.v)
+      VAL[B](fa.v,fa.name)
+    }
+  }
+
+  implicit def varFunctor = new Functor[VAR] {
+    override def map[A, B](fa: VAR[A])(f: (A) => B): VAR[B] = {
+      VAR[B](fa.name)
     }
   }
 
@@ -89,8 +98,12 @@ object EXPR {
     EXPR[F](I.inj(v))
   }
 
-  def valX(v: Int): EXPR[EXPRTYPE] = {
-    inject[VAL, EXPRTYPE](VAL(v))
+  def valX(v: Int,name:String = System.currentTimeMillis().toString): EXPR[EXPRTYPE] = {
+    inject[VAL, EXPRTYPE](VAL(v,name))
+  }
+
+  def varX(name:String = System.currentTimeMillis().toString): EXPR[EXPRTYPE] = {
+    inject[VAR, EXPRTYPE](VAR(name))
   }
 
   def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F]): EXPR[F] = {
@@ -128,6 +141,10 @@ object EXPR {
 
   implicit def EXPRToWrapper[F[_]](v: EXPR[F]): EXPRWrapper[F] = {
     EXPRWrapper(v)
+  }
+
+  implicit def WrapperToEXPR[F[_]](v: EXPRWrapper[F]): EXPR[F] = {
+    v.v
   }
 }
 
