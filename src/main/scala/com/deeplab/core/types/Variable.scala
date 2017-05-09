@@ -38,7 +38,7 @@ sealed case class Variable[A](v: A)(implicit ops: Ops[A]) {
 }
 
 object Variable {
-  implicit def AtoVariable[A](v: A)(implicit ops: Ops[A]): Variable[A] = {
+  implicit def AtoVariable[A,B](v: B)(implicit t:B=>A, ops: Ops[A]): Variable[A] = {
     Variable(v)
   }
 }

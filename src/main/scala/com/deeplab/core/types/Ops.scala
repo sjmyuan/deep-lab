@@ -55,4 +55,5 @@ class DoubleOps extends Ops[Double] {
 
 object Ops {
   implicit val doubleOps: Ops[Double] = new DoubleOps()
+  implicit def intToDouble(v:Int):Double = v toDouble 
 }

@@ -11,7 +11,7 @@ import cats.implicits._
   */
 case class EXPR[F[_]](v: F[EXPR[F]])
 
-case class VAL[A](v: Int,name:String)
+case class VAL[A](v: Variable[Double],name:String)
 
 case class VAR[A](name:String)
 
@@ -98,7 +98,7 @@ object EXPR {
     EXPR[F](I.inj(v))
   }
 
-  def valX(v: Int,name:String = System.currentTimeMillis().toString): EXPR[EXPRTYPE] = {
+  def valX(v: Variable[Double],name:String = System.currentTimeMillis().toString): EXPR[EXPRTYPE] = {
     inject[VAL, EXPRTYPE](VAL(v,name))
   }
 
