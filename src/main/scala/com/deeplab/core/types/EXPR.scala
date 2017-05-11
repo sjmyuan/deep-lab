@@ -107,6 +107,9 @@ object EXPR {
     inject[VAR, EXPRTYPE](DOUBLEVAR(name, List()))
   }
 
+  def iscalar(name: String): EXPR[EXPRTYPE] = {
+    inject[VAR, EXPRTYPE](INTVAR(name, List()))
+  }
 
   def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F]): EXPR[F] = {
     inject[ADD, F](ADD(lv, rv))
@@ -151,6 +154,10 @@ object EXPR {
 
   implicit def dscalarVal(v: Double): EXPRWrapper[EXPRTYPE] = {
     inject[VAR, EXPRTYPE](DOUBLEVAL(v, List(), ""))
+  }
+
+  implicit def iscalarVal(v: Int): EXPRWrapper[EXPRTYPE] = {
+    inject[VAR, EXPRTYPE](INTVAL(v, List(), ""))
   }
 }
 

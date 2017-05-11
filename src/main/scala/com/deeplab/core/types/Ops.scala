@@ -53,7 +53,31 @@ class DoubleOps extends Ops[Double] {
   override def ==(lv: Double, rv: Double): Boolean = lv == rv
 }
 
+class IntOps extends Ops[Int] {
+  override def +(lv: Int, rv: Int): Int = lv + rv
+
+  override def ==(lv: Int, rv: Int): Boolean = lv == rv
+
+  override def one(): Int = 1
+
+  override def /(lv: Int, rv: Int): Int = lv / rv
+
+  override def log(v: Int): Int = Math.log(v) toInt
+
+  override def exp(cap: Int): Int = Math.exp(cap) toInt
+
+  override def pow(lv: Int, rv: Int): Int = Math.pow(lv, rv) toInt
+
+  override def -(lv: Int, rv: Int): Int = lv - rv
+
+  override def *(lv: Int, rv: Int): Int = lv * rv
+
+  override def zero(): Int = 0
+}
+
 object Ops {
   implicit val doubleOps: Ops[Double] = new DoubleOps()
-  implicit def intToDouble(v:Int):Double = v toDouble 
+  implicit val intOps: Ops[Int] = new IntOps()
+
+  implicit def intToDouble(v: Int): Double = v toDouble
 }
