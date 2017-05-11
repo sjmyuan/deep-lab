@@ -12,18 +12,21 @@ trait EVAL[F[_]] {
 }
 
 object EVAL {
-  implicit def valEval = new EVAL[VAL] {
-    override def eval(v: VAL[(Map[String, Variable[Double]]) => Variable[Double]]): (Map[String, Variable[Double]]) => Variable[Double] = {
-      x: Map[String,Variable[Double]] => {
-        v.v
-      }
-    }
-  }
+//  implicit def valEval = new EVAL[VAL] {
+//    override def eval(v: VAL[(Map[String, Variable[Double]]) => Variable[Double]]): (Map[String, Variable[Double]]) => Variable[Double] = {
+//      x: Map[String,Variable[Double]] => {
+//        v.v
+//      }
+//    }
+//  }
 
   implicit def varEval = new EVAL[VAR] {
     override def eval(v: VAR[(Map[String, Variable[Double]]) => Variable[Double]]): (Map[String, Variable[Double]]) => Variable[Double] = {
       x: Map[String,Variable[Double]] => {
-        x(v.name)
+        v match {
+          case c:DOUBLEVAL[(Map[String, Variable[Double]]) => Variable[Double]] => c.v
+          case y:DOUBLEVAR[(Map[String, Variable[Double]]) => Variable[Double]] => x(y.name)
+        }
       }
     }
   }
