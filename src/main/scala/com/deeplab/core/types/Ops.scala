@@ -1,6 +1,10 @@
 package com.deeplab.core.types
 
+import cats.data.Coproduct
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
+import cats.free.Inject
+import EXPR._
+
 
 /**
   * Created by jiaming.shang on 4/14/17.
@@ -51,4 +55,5 @@ class DoubleOps extends Ops[Double] {
 
 object Ops {
   implicit val doubleOps: Ops[Double] = new DoubleOps()
+  implicit def intToDouble(v:Int):Double = v toDouble 
 }

@@ -3,73 +3,81 @@ package com.deeplab.core.types
 import org.scalatest.FunSpec
 import Ops._
 import Variable._
+import EXPR._
+import EVAL._
+import org.scalatest._
 
 /**
   * Created by jiaming.shang on 4/12/17.
   */
-class OPSpec extends FunSpec {
+class OPSpec extends FunSpec with Matchers {
   describe("An OP") {
-    describe("eval[Double]") {
-      describe("when is ADD") {
-        it("should return the sum of two number") {
-          val sum = ADD(CONS("", 1.0), CONS("", 1.0))
-          val f = SYMBOL.eval[Double](sum)
-          assert(f(1.0).v == 2.0)
+
+    describe("Expression") {
+      describe("Add"){
+        it("should return the right add expression"){
+          val expr1= valX(10)
+          val expr2= valX(10)
+          val result = expr1 + expr2
+          val expected = addExpr(expr1,expr2)
+
+          result.v should be (expected)
+        }
+
+        it("should return the wrong add expression"){
+          val expr1= valX(10)
+          val expr2= valX(10)
+          val expr3= valX(11)
+          val result = expr1 + expr2
+          val expected = addExpr(expr1,expr3)
+
+          result.v should not be (expected)
         }
       }
     }
-//    describe("derivate") {
-//      describe("when is ADD") {
-//        it("should return the sum of derivate") {
-////          val sum = ADD(VAR("x"), VAR("x"))
-////          val f = SYMBOL.grad[Double](sum, "x")
-////          assert(f(1) == 2)
-//        }
-//      }
-//      describe("when is MUL") {
-//        it("should return the derivate according to chain rule") {
-////          val mul = MUL(VAR("x"), VAR("x"))
-////          val f = SYMBOL.grad[Double](mul, "x")
-////          assert(f(2) == 4)
-//        }
-//      }
-//      describe("when is DIV") {
-//        it("should return the derivate according to chain rule") {
-//          val div = DIV(CONS("", 1.0), VAR("x"))
-//          val f = SYMBOL.grad[Double](div, "x")
-//          assert(f(2) == -0.25)
-//        }
-//      }
-//      describe("when is POW") {
-//        describe("when variable in base") {
-//          it("should return the derivate according to chain rule") {
-//            val pow = POW(VAR("x"), CONS("", 2))
-//            val f = SYMBOL.grad[Double](pow, "x")
-//            assert(f(3) == 6)
-//          }
-//        }
-//        describe("when variable in cap") {
-//          it("should return the derivate according to chain rule") {
-//            val pow = POW(CONS("", 2), VAR("x"))
-//            val f = SYMBOL.grad[Double](pow, "x")
-//            assert(f(3) == 8 * Math.log(2))
-//          }
-//        }
-//      }
-//      describe("when is EXP") {
-//        it("should return the derivate according to chain rule") {
-//          val exp = EXP(VAR("x"))
-//          val f = SYMBOL.grad[Double](exp, "x")
-//          assert(f(3) == Math.exp(3))
-//        }
-//      }
-//      describe("when is LOG") {
-//        it("should return the derivate according to chain rule") {
-//          val log = LOG(VAR("x"))
-//          val f = SYMBOL.grad[Double](log, "x")
-//          assert(f(2) == 0.5)
-//        }
-//      }
-//    }
+
+    describe("EVAL"){
+      describe("VAL") {
+        it("should return the constant value"){
+          val expr= valX(10)
+          val realExpr = eval(expr)
+          val result = realExpr(Map())
+          result.v should be (10)
+        }
+      }
+
+      describe("VAR") {
+        it("should return the variable value"){
+          val expr= varX("x")
+          val realExpr = eval(expr)
+          val result = realExpr(Map("x"->10))
+          result.v should be (10)
+        }
+      }
+
+      describe("ADD") {
+        describe("two var"){
+          it("should return the sum variable value"){
+            val x= varX("x")
+            val y= varX("y")
+            val expr=x+y
+            val realExpr = eval(expr)
+            val result = realExpr(Map("x"->10,"y"->20))
+            result.v should be (30)
+          }
+        }
+
+        describe("two val"){
+          it("should return the sum const value"){
+            val x= valX(10)
+            val y= valX(20)
+            val expr=x+y
+            val realExpr = eval(expr)
+            val result = realExpr(Map())
+            result.v should be (30)
+          }
+        }
+      }
+    }
   }
 }
