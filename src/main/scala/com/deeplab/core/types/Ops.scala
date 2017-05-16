@@ -17,62 +17,27 @@ trait Ops[A] {
   def *(lv: A, rv: A): A
 
   def /(lv: A, rv: A): A
-
-  def exp(cap: A): A
-
-  def pow(lv: A, rv: A): A
-
-  def log(v: A): A
-
-  def zero(): A
-
-  def one(): A
-
-  def ==(lv: A, rv: A): Boolean
 }
 
 class DoubleOps extends Ops[Double] {
   override def +(lv: Double, rv: Double): Double = lv + rv
 
-  override def one(): Double = 1.0
-
   override def /(lv: Double, rv: Double): Double = lv / rv
-
-  override def log(v: Double): Double = Math.log(v)
-
-  override def exp(cap: Double): Double = Math.exp(cap)
-
-  override def pow(lv: Double, rv: Double): Double = Math.pow(lv, rv)
 
   override def -(lv: Double, rv: Double): Double = lv - rv
 
   override def *(lv: Double, rv: Double): Double = lv * rv
-
-  override def zero(): Double = 0.0
-
-  override def ==(lv: Double, rv: Double): Boolean = lv == rv
 }
 
 class IntOps extends Ops[Int] {
   override def +(lv: Int, rv: Int): Int = lv + rv
 
-  override def ==(lv: Int, rv: Int): Boolean = lv == rv
-
-  override def one(): Int = 1
-
   override def /(lv: Int, rv: Int): Int = lv / rv
-
-  override def log(v: Int): Int = Math.log(v) toInt
-
-  override def exp(cap: Int): Int = Math.exp(cap) toInt
-
-  override def pow(lv: Int, rv: Int): Int = Math.pow(lv, rv) toInt
 
   override def -(lv: Int, rv: Int): Int = lv - rv
 
   override def *(lv: Int, rv: Int): Int = lv * rv
 
-  override def zero(): Int = 0
 }
 
 object Ops {

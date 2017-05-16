@@ -3,6 +3,7 @@ package com.deeplab.core.types
 import cats.Functor
 import cats.data.Coproduct
 import com.deeplab.core.types.EXPR.EXPRTYPE
+import Variable._
 
 /**
   * Created by jiaming.shang on 5/7/17.
@@ -12,14 +13,6 @@ trait EVAL[F[_]] {
 }
 
 object EVAL {
-//  implicit def valEval = new EVAL[VAL] {
-//    override def eval(v: VAL[(Map[String, Variable[Double]]) => Variable[Double]]): (Map[String, Variable[Double]]) => Variable[Double] = {
-//      x: Map[String,Variable[Double]] => {
-//        v.v
-//      }
-//    }
-//  }
-
   implicit def varEval = new EVAL[VAR] {
     override def eval(v: VAR[(Map[String, Variable[Double]]) => Variable[Double]]): (Map[String, Variable[Double]]) => Variable[Double] = {
       x: Map[String,Variable[Double]] => {
@@ -66,7 +59,7 @@ object EVAL {
   implicit def expEval = new EVAL[EXP] {
     override def eval(v: EXP[(Map[String, Variable[Double]]) => Variable[Double]]): (Map[String, Variable[Double]]) => Variable[Double] = {
       x: Map[String,Variable[Double]] => {
-        v.v(x).exp
+        exp(v.v(x))
       }
     }
   }
@@ -74,7 +67,7 @@ object EVAL {
   implicit def logEval = new EVAL[LOG] {
     override def eval(v: LOG[(Map[String, Variable[Double]]) => Variable[Double]]): (Map[String, Variable[Double]]) => Variable[Double] = {
       x: Map[String,Variable[Double]] => {
-        v.v(x).log
+        log(v.v(x))
       }
     }
   }
@@ -82,7 +75,7 @@ object EVAL {
   implicit def powEval = new EVAL[POW] {
     override def eval(v: POW[(Map[String, Variable[Double]]) => Variable[Double]]): (Map[String, Variable[Double]]) => Variable[Double] = {
       x: Map[String,Variable[Double]] => {
-        v.lv(x) pow v.rv(x)
+        pow(v.lv(x) ,v.rv(x))
       }
     }
   }
