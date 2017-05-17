@@ -3,6 +3,9 @@ package com.deeplab.core.types
 /**
   * Created by jiaming.shang on 4/14/17.
   */
+
+
+
 sealed case class Variable[A](v: A)(implicit ops: Ops[A]) {
   def +(o: Variable[A]): Variable[A] = {
     Variable(ops.+(v, o.v))
