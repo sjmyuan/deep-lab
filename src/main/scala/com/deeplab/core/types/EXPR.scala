@@ -53,6 +53,8 @@ object EXPR {
       fa match {
         case x: DOUBLEVAR[A] => x.copy()
         case y: DOUBLEVAL[A] => y.copy()
+        case y: INTVAL[A] => y.copy()
+        case y: INTVAR[A] => y.copy()
       }
     }
   }
