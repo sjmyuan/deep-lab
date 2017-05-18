@@ -44,7 +44,7 @@ class OPSpec extends FunSpec with Matchers {
           val expr= dscalarVal(10)
           val realExpr = eval(expr)
           val result = realExpr(Map())
-          result.v should be (10)
+          result should be (10)
         }
       }
 
@@ -53,7 +53,7 @@ class OPSpec extends FunSpec with Matchers {
           val expr= dscalar("x")
           val realExpr = eval(expr)
           val result = realExpr(Map("x"->10))
-          result.v should be (10)
+          result should be (10)
         }
       }
 
@@ -65,7 +65,7 @@ class OPSpec extends FunSpec with Matchers {
             val expr=x+y
             val realExpr = eval(expr)
             val result = realExpr(Map("x"->10,"y"->20))
-            result.v should be (30)
+            result should be (30)
           }
         }
 
@@ -76,7 +76,7 @@ class OPSpec extends FunSpec with Matchers {
             val expr=x+y
             val realExpr = eval(expr)
             val result = realExpr(Map())
-            result.v should be (30)
+            result should be (30)
           }
         }
 
@@ -87,7 +87,7 @@ class OPSpec extends FunSpec with Matchers {
               val expr=x+10.0
               val realExpr = eval(expr)
               val result = realExpr(Map("x"->20.0))
-              result.v should be (30)
+              result should be (30)
             }
           }
 
@@ -97,7 +97,7 @@ class OPSpec extends FunSpec with Matchers {
               val expr=10.0 + x
               val realExpr = eval(expr)
               val result = realExpr(Map("x"->20.0))
-              result.v should be (30)
+              result should be (30)
             }
           }
         }

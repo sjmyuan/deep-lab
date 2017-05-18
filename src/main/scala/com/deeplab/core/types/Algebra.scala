@@ -6,21 +6,65 @@ package com.deeplab.core.types
 
 trait Algebra {
   def Index(): Int
+
   def toDouble(): Algebra
+
+  def toFloat(): Algebra
+
+  def toInt(): Algebra
+
+  def toDoubleV(): Double
+
+  def toFloatV(): Float
+
+  def toIntV(): Int
 }
 
-class DoubleAlgebra extends Algebra {
-  def Index() = 2
-  def toDouble()= new DoubleAlgebra()
+case class DoubleAlgebra(v: Double = 0) extends Algebra {
+  override def Index() = 2
+
+  override def toDouble(): Algebra = this.copy()
+
+  override def toFloat(): Algebra = FloatAlgebra(v toFloat)
+
+  override def toInt(): Algebra = IntAlgebra(v toInt)
+
+  override def toDoubleV(): Double = v toDouble
+
+  override def toFloatV(): Float = v toFloat
+
+  override def toIntV(): Int = v toInt
 }
 
-class FloatAlgebra extends Algebra {
-  def Index() = 1
-  def toDouble() = new DoubleAlgebra()
+case class FloatAlgebra(v: Float = 0) extends Algebra {
+  override def Index() = 1
+
+  override def toDouble() = DoubleAlgebra(v)
+
+  override def toFloat() = this.copy()
+
+  override def toInt() = IntAlgebra(v toInt)
+
+  override def toDoubleV(): Double = v toDouble
+
+  override def toFloatV(): Float = v toFloat
+
+  override def toIntV(): Int = v toInt
 }
 
-class IntAlgebra extends Algebra {
-  def Index() = 0
-  def toDouble() = new DoubleAlgebra()
+case class IntAlgebra(v: Int = 0) extends Algebra {
+  override def Index() = 0
+
+  override def toDouble() = new DoubleAlgebra()
+
+  override def toFloat() = new DoubleAlgebra()
+
+  override def toInt() = new DoubleAlgebra()
+
+  override def toDoubleV(): Double = v toDouble
+
+  override def toFloatV(): Float = v toFloat
+
+  override def toIntV(): Int = v toInt
 }
 

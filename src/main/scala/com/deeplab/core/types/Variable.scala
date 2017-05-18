@@ -4,8 +4,6 @@ package com.deeplab.core.types
   * Created by jiaming.shang on 4/14/17.
   */
 
-
-
 sealed case class Variable[A](v: A)(implicit ops: Ops[A]) {
   def +(o: Variable[A]): Variable[A] = {
     Variable(ops.+(v, o.v))
@@ -28,6 +26,9 @@ object Variable {
   implicit def AtoVariable[A,B](v: B)(implicit t:B=>A, ops: Ops[A]): Variable[A] = {
     Variable(v)
   }
+
+  implicit def intToAlgebra(v:Int):Algebra = IntAlgebra(v)
+  implicit def doubleToAlgebra(v:Double):Algebra = DoubleAlgebra(v)
 
   def exp(v: Variable[Double])= Variable(Math.exp(v.v))
   def log(v: Variable[Double])= Variable(Math.log(v.v))
