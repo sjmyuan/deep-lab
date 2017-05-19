@@ -40,9 +40,20 @@ class IntOps extends Ops[Int] {
 
 }
 
+class FloatOps extends Ops[Float] {
+  override def +(lv: Float, rv: Float): Float = lv+rv
+
+  override def /(lv: Float, rv: Float): Float = lv/rv
+
+  override def -(lv: Float, rv: Float): Float = lv-rv
+
+  override def *(lv: Float, rv: Float): Float = lv*rv
+}
+
 object Ops {
   implicit val doubleOps: Ops[Double] = new DoubleOps()
   implicit val intOps: Ops[Int] = new IntOps()
+  implicit val floatOps: Ops[Float] = new FloatOps()
 
   implicit def intToDouble(v: Int): Double = v toDouble
 }

@@ -63,7 +63,7 @@ object EVAL {
   implicit def expIntEval = new EVAL[EXP, Int] {
     override def eval(v: EXP[AlgebraFunction[Int]]): AlgebraFunction[Int] = {
       x: Map[String, Variable[Int]] => {
-        v.v(x)
+        null
       }
     }
   }
@@ -71,7 +71,7 @@ object EVAL {
   implicit def logIntEval = new EVAL[LOG, Int] {
     override def eval(v: LOG[AlgebraFunction[Int]]): AlgebraFunction[Int] = {
       x: Map[String, Variable[Int]] => {
-        v.v(x)
+        null
       }
     }
   }
@@ -79,11 +79,77 @@ object EVAL {
   implicit def powIntEval = new EVAL[POW, Int] {
     override def eval(v: POW[AlgebraFunction[Int]]): AlgebraFunction[Int] = {
       x: Map[String, Variable[Int]] => {
-        v.lv(x)
+        null
       }
     }
   }
 
+  implicit def varFloatEval = new EVAL[VAR, Float] {
+    override def eval(v: VAR[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
+      x: Map[String, Variable[Float]] => {
+        v match {
+          case c: FLOATVAL[AlgebraFunction[Float]] => c.v
+          case y: FLOATVAR[AlgebraFunction[Float]] => x(y.name)
+        }
+      }
+    }
+  }
+
+  implicit def addFloatEval = new EVAL[ADD, Float] {
+    override def eval(v: ADD[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
+      x: Map[String, Variable[Float]] => {
+        v.lv(x) + v.rv(x)
+      }
+    }
+  }
+
+  implicit def subFloatEval = new EVAL[SUB, Float] {
+    override def eval(v: SUB[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
+      x: Map[String, Variable[Float]] => {
+        v.lv(x) - v.rv(x)
+      }
+    }
+  }
+
+  implicit def mulFloatEval = new EVAL[MUL, Float] {
+    override def eval(v: MUL[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
+      x: Map[String, Variable[Float]] => {
+        v.lv(x) * v.rv(x)
+      }
+    }
+  }
+
+  implicit def divFloatEval = new EVAL[DIV, Float] {
+    override def eval(v: DIV[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
+      x: Map[String, Variable[Float]] => {
+        v.lv(x) / v.rv(x)
+      }
+    }
+  }
+
+  implicit def expFloatEval = new EVAL[EXP, Float] {
+    override def eval(v: EXP[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
+      x: Map[String, Variable[Float]] => {
+        expFloat(v.v(x))
+      }
+    }
+  }
+
+  implicit def logFloatEval = new EVAL[LOG, Float] {
+    override def eval(v: LOG[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
+      x: Map[String, Variable[Float]] => {
+        logFloat(v.v(x))
+      }
+    }
+  }
+
+  implicit def powFloatEval = new EVAL[POW, Float] {
+    override def eval(v: POW[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
+      x: Map[String, Variable[Float]] => {
+        powFloat(v.lv(x), v.rv(x))
+      }
+    }
+  }
   implicit def varEval = new EVAL[VAR, Double] {
     override def eval(v: VAR[AlgebraFunction[Double]]): AlgebraFunction[Double] = {
       x: Map[String, Variable[Double]] => {

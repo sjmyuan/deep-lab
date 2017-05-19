@@ -33,4 +33,8 @@ object Variable {
   def exp(v: Variable[Double])= Variable(Math.exp(v.v))
   def log(v: Variable[Double])= Variable(Math.log(v.v))
   def pow(lv: Variable[Double],rv:Variable[Double])= Variable(Math.pow(lv.v,rv.v))
+
+  def expFloat(v: Variable[Float])= Variable[Float](Math.exp(v.v) toFloat)
+  def logFloat(v: Variable[Float])= Variable[Float](Math.log(v.v) toFloat)
+  def powFloat(lv: Variable[Float],rv:Variable[Float])= Variable[Float](Math.pow(lv.v,rv.v) toFloat)
 }
