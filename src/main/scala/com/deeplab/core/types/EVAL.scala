@@ -233,21 +233,27 @@ object EVAL {
         val algebra = inspect(expr)
         algebra match {
           case _:IntAlgebra => {
-            val feval:EVAL[F,Int] = implicitly[EVAL[F,Int]]
-            val func=EXPR.fold(expr) { v: F[AlgebraFunction[Int]] => feval.eval(v) }
+            val func=ieval(expr)
             x:Map[String,Algebra] => {
               val paras=x.mapValues{x:Algebra => Variable(x.toIntV()) }
               func(paras).v
             }
           }
           case _:DoubleAlgebra => {
-            val feval:EVAL[F,Double] = implicitly[EVAL[F,Double]]
-            val func=EXPR.fold(expr) { v: F[AlgebraFunction[Double]] => feval.eval(v) }
+            val func=deval(expr)
             x:Map[String,Algebra] => {
               val paras=x.mapValues{x:Algebra => Variable(x.toDoubleV()) }
               func(paras).v
             }
           }
         }
+  }
+
+  def ieval[F[_]](expr:EXPR[F])(implicit f:Functor[F],feval:EVAL[F,Int]):AlgebraFunction[Int] ={
+    EXPR.fold(expr) {v:F[AlgebraFunction[Int]] => feval.eval(v)}
+  }
+
+  def deval[F[_]](expr:EXPR[F])(implicit f:Functor[F],feval:EVAL[F,Double]):AlgebraFunction[Double] ={
+    EXPR.fold(expr) {v:F[AlgebraFunction[Double]] => feval.eval(v)}
   }
 }
