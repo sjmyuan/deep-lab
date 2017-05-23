@@ -11,9 +11,19 @@ import cats.implicits._
   */
 case class EXPR[F[_]](v: F[EXPR[F]])
 
-case class VAL[A](v: Variable[Double],name:String)
+trait VAR[A]
 
-case class VAR[A](name:String)
+case class INTVAR[A](name: String, broadcastable: List[Boolean]) extends VAR[A]
+
+case class FLOATVAR[A](name: String, broadcastable: List[Boolean]) extends VAR[A]
+
+case class DOUBLEVAR[A](name: String, broadcastable: List[Boolean]) extends VAR[A]
+
+case class INTVAL[A](v: Variable[Int], broadcastable: List[Boolean], name: String) extends VAR[A]
+
+case class FLOATVAL[A](v: Variable[Float], broadcastable: List[Boolean], name: String) extends VAR[A]
+
+case class DOUBLEVAL[A](v: Variable[Double], broadcastable: List[Boolean], name: String) extends VAR[A]
 
 case class ADD[A](lv: A, rv: A)
 
@@ -30,25 +40,22 @@ case class LOG[A](v: A)
 case class EXP[A](v: A)
 
 object EXPR {
-  type EXPRTYPE1[A] = Coproduct[ADD, VAL, A]
-  type EXPRTYPE2[A] = Coproduct[SUB, EXPRTYPE1, A]
-  type EXPRTYPE3[A] = Coproduct[MUL, EXPRTYPE2, A]
-  type EXPRTYPE4[A] = Coproduct[DIV, EXPRTYPE3, A]
-  type EXPRTYPE5[A] = Coproduct[POW, EXPRTYPE4, A]
-  type EXPRTYPE6[A] = Coproduct[LOG, EXPRTYPE5, A]
-  type EXPRTYPE7[A] = Coproduct[VAR, EXPRTYPE6, A]
-  type EXPRTYPE[A] = Coproduct[EXP, EXPRTYPE7, A]
-
-
-  implicit def valFunctor = new Functor[VAL] {
-    override def map[A, B](fa: VAL[A])(f: (A) => B): VAL[B] = {
-      VAL[B](fa.v,fa.name)
-    }
-  }
+  type EXPRTYPE1[A] = Coproduct[SUB, ADD, A]
+  type EXPRTYPE2[A] = Coproduct[MUL, EXPRTYPE1, A]
+  type EXPRTYPE3[A] = Coproduct[DIV, EXPRTYPE2, A]
+  type EXPRTYPE4[A] = Coproduct[POW, EXPRTYPE3, A]
+  type EXPRTYPE5[A] = Coproduct[LOG, EXPRTYPE4, A]
+  type EXPRTYPE6[A] = Coproduct[VAR, EXPRTYPE5, A]
+  type EXPRTYPE[A] = Coproduct[EXP, EXPRTYPE6, A]
 
   implicit def varFunctor = new Functor[VAR] {
     override def map[A, B](fa: VAR[A])(f: (A) => B): VAR[B] = {
-      VAR[B](fa.name)
+      fa match {
+        case x: DOUBLEVAR[A] => x.copy()
+        case y: DOUBLEVAL[A] => y.copy()
+        case y: INTVAL[A] => y.copy()
+        case y: INTVAR[A] => y.copy()
+      }
     }
   }
 
@@ -98,12 +105,12 @@ object EXPR {
     EXPR[F](I.inj(v))
   }
 
-  def valX(v: Variable[Double],name:String = System.currentTimeMillis().toString): EXPR[EXPRTYPE] = {
-    inject[VAL, EXPRTYPE](VAL(v,name))
+  def dscalar(name: String): EXPR[EXPRTYPE] = {
+    inject[VAR, EXPRTYPE](DOUBLEVAR(name, List()))
   }
 
-  def varX(name:String = System.currentTimeMillis().toString): EXPR[EXPRTYPE] = {
-    inject[VAR, EXPRTYPE](VAR(name))
+  def iscalar(name: String): EXPR[EXPRTYPE] = {
+    inject[VAR, EXPRTYPE](INTVAR(name, List()))
   }
 
   def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F]): EXPR[F] = {
@@ -145,6 +152,14 @@ object EXPR {
 
   implicit def WrapperToEXPR[F[_]](v: EXPRWrapper[F]): EXPR[F] = {
     v.v
+  }
+
+  implicit def dscalarVal(v: Double): EXPRWrapper[EXPRTYPE] = {
+    inject[VAR, EXPRTYPE](DOUBLEVAL(v, List(), ""))
+  }
+
+  implicit def iscalarVal(v: Int): EXPRWrapper[EXPRTYPE] = {
+    inject[VAR, EXPRTYPE](INTVAL(v, List(), ""))
   }
 }
 

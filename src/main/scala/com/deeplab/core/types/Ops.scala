@@ -17,43 +17,43 @@ trait Ops[A] {
   def *(lv: A, rv: A): A
 
   def /(lv: A, rv: A): A
-
-  def exp(cap: A): A
-
-  def pow(lv: A, rv: A): A
-
-  def log(v: A): A
-
-  def zero(): A
-
-  def one(): A
-
-  def ==(lv: A, rv: A): Boolean
 }
 
 class DoubleOps extends Ops[Double] {
   override def +(lv: Double, rv: Double): Double = lv + rv
 
-  override def one(): Double = 1.0
-
   override def /(lv: Double, rv: Double): Double = lv / rv
-
-  override def log(v: Double): Double = Math.log(v)
-
-  override def exp(cap: Double): Double = Math.exp(cap)
-
-  override def pow(lv: Double, rv: Double): Double = Math.pow(lv, rv)
 
   override def -(lv: Double, rv: Double): Double = lv - rv
 
   override def *(lv: Double, rv: Double): Double = lv * rv
+}
 
-  override def zero(): Double = 0.0
+class IntOps extends Ops[Int] {
+  override def +(lv: Int, rv: Int): Int = lv + rv
 
-  override def ==(lv: Double, rv: Double): Boolean = lv == rv
+  override def /(lv: Int, rv: Int): Int = lv / rv
+
+  override def -(lv: Int, rv: Int): Int = lv - rv
+
+  override def *(lv: Int, rv: Int): Int = lv * rv
+
+}
+
+class FloatOps extends Ops[Float] {
+  override def +(lv: Float, rv: Float): Float = lv+rv
+
+  override def /(lv: Float, rv: Float): Float = lv/rv
+
+  override def -(lv: Float, rv: Float): Float = lv-rv
+
+  override def *(lv: Float, rv: Float): Float = lv*rv
 }
 
 object Ops {
   implicit val doubleOps: Ops[Double] = new DoubleOps()
-  implicit def intToDouble(v:Int):Double = v toDouble 
+  implicit val intOps: Ops[Int] = new IntOps()
+  implicit val floatOps: Ops[Float] = new FloatOps()
+
+  implicit def intToDouble(v: Int): Double = v toDouble
 }

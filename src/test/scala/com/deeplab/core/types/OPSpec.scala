@@ -15,23 +15,25 @@ class OPSpec extends FunSpec with Matchers {
 
     describe("Expression") {
       describe("Add"){
-        it("should return the right add expression"){
-          val expr1= valX(10)
-          val expr2= valX(10)
-          val result = expr1 + expr2
-          val expected = addExpr(expr1,expr2)
+        describe("left associate"){
+          it("should return the right expression") {
+            val expr1 = dscalar("x")
+            val expr2 = dscalarVal(10.0)
+            val result = expr1 + 10.0
+            val expected = addExpr(expr1, expr2)
 
-          result.v should be (expected)
+            result.v should be (expected)
+          }
         }
+        describe("right associate"){
+          it("should return the right expression") {
+            val expr1 = dscalar("x")
+            val expr2 = dscalarVal(10.0)
+            val result = 10.0 + expr1
+            val expected = addExpr(expr2, expr1)
 
-        it("should return the wrong add expression"){
-          val expr1= valX(10)
-          val expr2= valX(10)
-          val expr3= valX(11)
-          val result = expr1 + expr2
-          val expected = addExpr(expr1,expr3)
-
-          result.v should not be (expected)
+            result.v should be (expected)
+          }
         }
       }
     }
@@ -39,42 +41,64 @@ class OPSpec extends FunSpec with Matchers {
     describe("EVAL"){
       describe("VAL") {
         it("should return the constant value"){
-          val expr= valX(10)
+          val expr= dscalarVal(10)
           val realExpr = eval(expr)
           val result = realExpr(Map())
-          result.v should be (10)
+          result should be (10)
         }
       }
 
       describe("VAR") {
         it("should return the variable value"){
-          val expr= varX("x")
+          val expr= dscalar("x")
           val realExpr = eval(expr)
           val result = realExpr(Map("x"->10))
-          result.v should be (10)
+          result should be (10)
         }
       }
 
       describe("ADD") {
         describe("two var"){
           it("should return the sum variable value"){
-            val x= varX("x")
-            val y= varX("y")
+            val x= dscalar("x")
+            val y= dscalar("y")
             val expr=x+y
             val realExpr = eval(expr)
             val result = realExpr(Map("x"->10,"y"->20))
-            result.v should be (30)
+            result should be (30)
           }
         }
 
         describe("two val"){
           it("should return the sum const value"){
-            val x= valX(10)
-            val y= valX(20)
+            val x= dscalarVal(10)
+            val y= dscalarVal(20)
             val expr=x+y
             val realExpr = eval(expr)
             val result = realExpr(Map())
-            result.v should be (30)
+            result should be (30)
+          }
+        }
+
+        describe("var and val"){
+          describe("left associate") {
+            it("should return the sum of var and val"){
+              val x= dscalar("x")
+              val expr=x+10.0
+              val realExpr = eval(expr)
+              val result = realExpr(Map("x"->20.0))
+              result should be (30)
+            }
+          }
+
+          describe("right associate") {
+            it("should return the sum of var and val"){
+              val x= dscalar("x")
+              val expr=10.0 + x
+              val realExpr = eval(expr)
+              val result = realExpr(Map("x"->20.0))
+              result should be (30)
+            }
           }
         }
       }
