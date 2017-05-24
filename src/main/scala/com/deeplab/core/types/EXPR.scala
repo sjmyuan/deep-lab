@@ -11,19 +11,19 @@ import cats.implicits._
   */
 case class EXPR[F[_]](v: F[EXPR[F]])
 
-trait VAR[A]
+abstract class VAR[A](val name: String, val broadcastable: List[Boolean])
 
-case class INTVAR[A](name: String, broadcastable: List[Boolean]) extends VAR[A]
+case class INTVAR[A](override val name: String, override val broadcastable: List[Boolean]) extends VAR[A](name, broadcastable)
 
-case class FLOATVAR[A](name: String, broadcastable: List[Boolean]) extends VAR[A]
+case class FLOATVAR[A](override val name: String, override val broadcastable: List[Boolean]) extends VAR[A](name, broadcastable)
 
-case class DOUBLEVAR[A](name: String, broadcastable: List[Boolean]) extends VAR[A]
+case class DOUBLEVAR[A](override val name: String, override val broadcastable: List[Boolean]) extends VAR[A](name, broadcastable)
 
-case class INTVAL[A](v: Variable[Int], broadcastable: List[Boolean], name: String) extends VAR[A]
+case class INTVAL[A](v: Variable[Int], override val broadcastable: List[Boolean], override val name: String) extends VAR[A](name, broadcastable)
 
-case class FLOATVAL[A](v: Variable[Float], broadcastable: List[Boolean], name: String) extends VAR[A]
+case class FLOATVAL[A](v: Variable[Float], override val broadcastable: List[Boolean], override val name: String) extends VAR[A](name, broadcastable)
 
-case class DOUBLEVAL[A](v: Variable[Double], broadcastable: List[Boolean], name: String) extends VAR[A]
+case class DOUBLEVAL[A](v: Variable[Double], override val broadcastable: List[Boolean], override val name: String) extends VAR[A](name, broadcastable)
 
 case class ADD[A](lv: A, rv: A)
 
@@ -113,6 +113,14 @@ object EXPR {
     inject[VAR, EXPRTYPE](INTVAR(name, List()))
   }
 
+  def dscalarVal(v: Double, name: String = ""): EXPR[EXPRTYPE] = {
+    inject[VAR, EXPRTYPE](DOUBLEVAL(v, List(), ""))
+  }
+
+  def iscalarVal(v: Int, name: String = ""): EXPR[EXPRTYPE] = {
+    inject[VAR, EXPRTYPE](INTVAL(v, List(), ""))
+  }
+
   def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F]): EXPR[F] = {
     inject[ADD, F](ADD(lv, rv))
   }
@@ -154,11 +162,11 @@ object EXPR {
     v.v
   }
 
-  implicit def dscalarVal(v: Double): EXPRWrapper[EXPRTYPE] = {
+  implicit def dscalarValWrapper(v: Double): EXPRWrapper[EXPRTYPE] = {
     inject[VAR, EXPRTYPE](DOUBLEVAL(v, List(), ""))
   }
 
-  implicit def iscalarVal(v: Int): EXPRWrapper[EXPRTYPE] = {
+  implicit def iscalarValWrapper(v: Int): EXPRWrapper[EXPRTYPE] = {
     inject[VAR, EXPRTYPE](INTVAL(v, List(), ""))
   }
 }
