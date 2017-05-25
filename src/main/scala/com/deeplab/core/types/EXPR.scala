@@ -171,7 +171,9 @@ object EXPR {
   }
 
   def subExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[SUB, F],varI:Inject[VAR,F],negI:Inject[NEG,F]): EXPR[F] = {
-    if(isZeroExpr(lv))
+    if(lv == rv)
+      inject[VAR,F](ZERO("",List()))
+    else if(isZeroExpr(lv))
       negExpr(rv)
     else if (isZeroExpr(rv))
       lv
@@ -191,7 +193,9 @@ object EXPR {
   }
 
   def divExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[DIV, F],varI:Inject[VAR,F]): EXPR[F] = {
-    if(isZeroExpr(lv)||isOneExpr(rv))
+    if(lv == rv)
+      inject[VAR,F](ONE("",List()))
+    else if(isZeroExpr(lv)||isOneExpr(rv))
       lv
     else
       inject[DIV, F](DIV(lv, rv))
