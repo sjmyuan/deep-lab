@@ -64,7 +64,18 @@ class GradSpec extends FunSpec with Matchers {
           val expected = addExpr(dscalarVal(0),dscalarVal(1))
 
           result should be (expected)
+        }
+      }
 
+      describe("when constant add constant") {
+        it("should return 0 "){
+          val x = dscalarVal(1)
+          val expr = 1+x
+          val y = dscalar("y")
+          val result = grad(expr,y)
+          val expected = dscalarVal(0)
+
+          result should be (expected)
         }
       }
     }

@@ -24,6 +24,12 @@ object GRAD{
     }
   }
 
+  implicit def negGrad = new GRAD[NEG] {
+    override def grad(v: NEG[OriginAndGrad], x: VAR[_]): OriginAndGrad = {
+      (negExpr(v.v._1),negExpr(v.v._2))
+    }
+  }
+
   implicit def addGrad = new GRAD[ADD] {
     override def grad(v: ADD[OriginAndGrad], x:VAR[_]): OriginAndGrad = {
       (addExpr(v.lv._1,v.rv._1),addExpr(v.lv._2,v.rv._2))

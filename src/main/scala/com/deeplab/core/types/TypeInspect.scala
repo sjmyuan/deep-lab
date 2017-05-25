@@ -25,6 +25,12 @@ object TypeInspect {
     }
   }
 
+  implicit def negInspect = new TypeInspect[NEG] {
+    override def inspect(v: NEG[Algebra]): Algebra = {
+      v.v
+    }
+  }
+
   implicit def addInspect = new TypeInspect[ADD] {
     override def inspect(v: ADD[Algebra]): Algebra = {
       if (v.lv.Index > v.rv.Index)

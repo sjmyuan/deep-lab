@@ -25,6 +25,10 @@ case class FLOATVAL[A](v: Variable[Float], override val broadcastable: List[Bool
 
 case class DOUBLEVAL[A](v: Variable[Double], override val broadcastable: List[Boolean], override val name: String) extends VAR[A](name, broadcastable)
 
+case class ZERO[A](override val name: String, override val broadcastable: List[Boolean]) extends VAR[A](name, broadcastable)
+
+case class ONE[A](override val name: String, override val broadcastable: List[Boolean]) extends VAR[A](name, broadcastable)
+
 case class ADD[A](lv: A, rv: A)
 
 case class SUB[A](lv: A, rv: A)
@@ -39,6 +43,8 @@ case class LOG[A](v: A)
 
 case class EXP[A](v: A)
 
+case class NEG[A](v: A)
+
 object EXPR {
   type EXPRTYPE1[A] = Coproduct[SUB, ADD, A]
   type EXPRTYPE2[A] = Coproduct[MUL, EXPRTYPE1, A]
@@ -46,16 +52,25 @@ object EXPR {
   type EXPRTYPE4[A] = Coproduct[POW, EXPRTYPE3, A]
   type EXPRTYPE5[A] = Coproduct[LOG, EXPRTYPE4, A]
   type EXPRTYPE6[A] = Coproduct[VAR, EXPRTYPE5, A]
-  type EXPRTYPE[A] = Coproduct[EXP, EXPRTYPE6, A]
+  type EXPRTYPE7[A] = Coproduct[NEG, EXPRTYPE6, A]
+  type EXPRTYPE[A] = Coproduct[EXP, EXPRTYPE7, A]
 
   implicit def varFunctor = new Functor[VAR] {
     override def map[A, B](fa: VAR[A])(f: (A) => B): VAR[B] = {
       fa match {
-        case x: DOUBLEVAR[A] => x.copy()
+        case y: DOUBLEVAR[A] => y.copy()
         case y: DOUBLEVAL[A] => y.copy()
         case y: INTVAL[A] => y.copy()
         case y: INTVAR[A] => y.copy()
+        case y: ONE[A] => y.copy()
+        case y: ZERO[A] => y.copy()
       }
+    }
+  }
+
+  implicit def negFunctor = new Functor[NEG] {
+    override def map[A, B](fa: NEG[A])(f: (A) => B): NEG[B] = {
+      NEG[B](f(fa.v))
     }
   }
 
@@ -114,27 +129,72 @@ object EXPR {
   }
 
   def dscalarVal(v: Double, name: String = ""): EXPR[EXPRTYPE] = {
-    inject[VAR, EXPRTYPE](DOUBLEVAL(v, List(), ""))
+    if (v == 0)
+      inject[VAR, EXPRTYPE](ZERO(name, List()))
+    else if (v == 1)
+      inject[VAR, EXPRTYPE](ONE(name, List()))
+    else
+      inject[VAR, EXPRTYPE](DOUBLEVAL(v, List(), ""))
   }
 
   def iscalarVal(v: Int, name: String = ""): EXPR[EXPRTYPE] = {
-    inject[VAR, EXPRTYPE](INTVAL(v, List(), ""))
+    if (v == 0)
+      inject[VAR, EXPRTYPE](ZERO(name, List()))
+    else if (v == 1)
+      inject[VAR, EXPRTYPE](ONE(name, List()))
+    else
+      inject[VAR, EXPRTYPE](INTVAL(v, List(), ""))
   }
 
-  def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F]): EXPR[F] = {
-    inject[ADD, F](ADD(lv, rv))
+  def isZeroExpr[F[_]](v:EXPR[F])(implicit I:Inject[VAR,F]):Boolean = {
+    I.prj(v.v).map(x => x.isInstanceOf[ZERO[EXPR[F]]]).getOrElse(false)
   }
 
-  def subExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[SUB, F]): EXPR[F] = {
-    inject[SUB, F](SUB(lv, rv))
+  def isOneExpr[F[_]](v:EXPR[F])(implicit I:Inject[VAR,F]):Boolean = {
+    I.prj(v.v).map(x => x.isInstanceOf[ONE[EXPR[F]]]).getOrElse(false)
   }
 
-  def mulExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[MUL, F]): EXPR[F] = {
-    inject[MUL, F](MUL(lv, rv))
+  def negExpr[F[_]](v:EXPR[F])(implicit I:Inject[NEG,F],varI:Inject[VAR,F]):EXPR[F] ={
+    if(isZeroExpr(v))
+      v
+    else
+      inject[NEG,F](NEG(v))
   }
 
-  def divExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[DIV, F]): EXPR[F] = {
-    inject[DIV, F](DIV(lv, rv))
+  def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F],varI:Inject[VAR,F]): EXPR[F] = {
+    if(isZeroExpr(lv))
+      rv
+    else if (isZeroExpr(rv))
+      lv
+    else
+      inject[ADD, F](ADD(lv, rv))
+  }
+
+  def subExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[SUB, F],varI:Inject[VAR,F],negI:Inject[NEG,F]): EXPR[F] = {
+    if(isZeroExpr(lv))
+      negExpr(rv)
+    else if (isZeroExpr(rv))
+      lv
+    else
+      inject[SUB, F](SUB(lv, rv))
+  }
+
+  def mulExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[MUL, F],varI:Inject[VAR,F]): EXPR[F] = {
+    if(isZeroExpr(lv)||isZeroExpr(rv))
+      lv
+    else if(isOneExpr(lv))
+      rv
+    else if (isOneExpr(rv))
+      lv
+    else
+      inject[MUL, F](MUL(lv, rv))
+  }
+
+  def divExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[DIV, F],varI:Inject[VAR,F]): EXPR[F] = {
+    if(isZeroExpr(lv)||isOneExpr(rv))
+      lv
+    else
+      inject[DIV, F](DIV(lv, rv))
   }
 
   def powExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[POW, F]): EXPR[F] = {
@@ -163,11 +223,11 @@ object EXPR {
   }
 
   implicit def dscalarValWrapper(v: Double): EXPRWrapper[EXPRTYPE] = {
-    inject[VAR, EXPRTYPE](DOUBLEVAL(v, List(), ""))
+    dscalarVal(v)
   }
 
   implicit def iscalarValWrapper(v: Int): EXPRWrapper[EXPRTYPE] = {
-    inject[VAR, EXPRTYPE](INTVAL(v, List(), ""))
+    iscalarVal(v)
   }
 }
 
