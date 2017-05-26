@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
 )
 
 resolvers += Resolver.sonatypeRepo("releases")
+resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 
 addCompilerPlugin("org.spire-math" %% "kind-projector" % "0.9.3")
 

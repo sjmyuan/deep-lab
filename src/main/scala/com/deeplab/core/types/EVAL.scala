@@ -23,6 +23,8 @@ object EVAL {
         v match {
           case c: INTVAL[AlgebraFunction[Int]] => c.v
           case y: INTVAR[AlgebraFunction[Int]] => x(y.name)
+          case y: ZERO[AlgebraFunction[Int]] => 0
+          case y: ONE[AlgebraFunction[Int]] => 1
         }
       }
     }
@@ -84,12 +86,22 @@ object EVAL {
     }
   }
 
+  implicit def negIntEval = new EVAL[NEG, Int]{
+    override def eval(v: NEG[AlgebraFunction[Int]]): AlgebraFunction[Int] = {
+      x: Map[String,Variable[Int]] => {
+        v.v(x).neg
+      }
+    }
+  }
+
   implicit def varFloatEval = new EVAL[VAR, Float] {
     override def eval(v: VAR[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
       x: Map[String, Variable[Float]] => {
         v match {
           case c: FLOATVAL[AlgebraFunction[Float]] => c.v
           case y: FLOATVAR[AlgebraFunction[Float]] => x(y.name)
+          case y: ZERO[AlgebraFunction[Float]] => 0 toFloat
+          case y: ONE[AlgebraFunction[Float]] => 1 toFloat
         }
       }
     }
@@ -150,12 +162,23 @@ object EVAL {
       }
     }
   }
+
+  implicit def negFloatEval = new EVAL[NEG, Float]{
+    override def eval(v: NEG[AlgebraFunction[Float]]): AlgebraFunction[Float] = {
+      x: Map[String,Variable[Float]] => {
+        v.v(x).neg
+      }
+    }
+  }
+
   implicit def varEval = new EVAL[VAR, Double] {
     override def eval(v: VAR[AlgebraFunction[Double]]): AlgebraFunction[Double] = {
       x: Map[String, Variable[Double]] => {
         v match {
           case c: DOUBLEVAL[AlgebraFunction[Double]] => c.v
           case y: DOUBLEVAR[AlgebraFunction[Double]] => x(y.name)
+          case y: ZERO[AlgebraFunction[Double]] => 0
+          case y: ONE[AlgebraFunction[Double]] => 1
         }
       }
     }
@@ -213,6 +236,14 @@ object EVAL {
     override def eval(v: POW[AlgebraFunction[Double]]): AlgebraFunction[Double] = {
       x: Map[String, Variable[Double]] => {
         pow(v.lv(x), v.rv(x))
+      }
+    }
+  }
+
+  implicit def negDoubleEval = new EVAL[NEG, Double]{
+    override def eval(v: NEG[AlgebraFunction[Double]]): AlgebraFunction[Double] = {
+      x: Map[String,Variable[Double]] => {
+        v.v(x).neg
       }
     }
   }

@@ -1,3 +1,2 @@
-//resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
-//addSbtPlugin("com.github.mpeltonen" % "sbt-idea" % "1.7.0-SNAPSHOT")
+resolvers += "Artima Maven Repository" at "http://repo.artima.com/releases"
 addSbtPlugin("com.artima.supersafe" % "sbtplugin" % "1.1.2")

@@ -20,6 +20,10 @@ sealed case class Variable[A](v: A)(implicit ops: Ops[A]) {
   def /(o: Variable[A]): Variable[A] = {
     Variable(ops./(v, o.v))
   }
+
+  def neg():Variable[A] = {
+    Variable(ops.neg(v))
+  }
 }
 
 object Variable {
