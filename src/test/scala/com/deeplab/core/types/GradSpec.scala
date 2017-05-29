@@ -2,6 +2,7 @@ package com.deeplab.core.types
 
 import org.scalatest._
 import EXPR._
+import Optimize._
 import GRAD._
 import EVAL._
 import Variable._
@@ -63,7 +64,7 @@ class GradSpec extends FunSpec with Matchers {
           val x = dscalar("x")
           val expr = 1+x
           val result = grad(expr,x)
-          val expected = addExpr(dscalarVal(0),dscalarVal(1))
+          val expected = optimize(addExpr(dscalarVal(0),dscalarVal(1)))
 
           result should be (expected)
         }
@@ -111,7 +112,7 @@ class GradSpec extends FunSpec with Matchers {
           val x = dscalar("x")
           val expr = x*x
           val result = grad(expr,x)
-          val expected = addExpr(x,x)
+          val expected = optimize(addExpr(x,x))
 
           result should be (expected)
         }
@@ -124,7 +125,7 @@ class GradSpec extends FunSpec with Matchers {
           val x = dscalar("x")
           val expr = 1/x
           val result = grad(expr,x)
-          val expected:EXPR[EXPRTYPE] = -(1/(x+x))
+          val expected:EXPR[EXPRTYPE] = optimize(-(1/(x+x)))
 
           result should be (expected)
         }

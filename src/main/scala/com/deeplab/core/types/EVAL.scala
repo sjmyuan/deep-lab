@@ -6,6 +6,7 @@ import com.deeplab.core.types.EXPR.EXPRTYPE
 import Variable._
 import TypeInspect._
 import com.deeplab.core.types.EVAL.AlgebraFunction
+import Optimize._
 
 /**
   * Created by jiaming.shang on 5/7/17.
@@ -260,6 +261,7 @@ object EVAL {
   def eval[F[_]](expr: EXPR[F])(implicit ffunctor: Functor[F],
                                 intEval:EVAL[F,Int],
                                 doubleEval:EVAL[F,Double],
+                                opt:Optimize[F,F],
                                 typeInspect: TypeInspect[F]): Map[String, Algebra] => Any= {
         val algebra = inspect(expr)
         algebra match {
@@ -280,11 +282,11 @@ object EVAL {
         }
   }
 
-  def ieval[F[_]](expr:EXPR[F])(implicit f:Functor[F],feval:EVAL[F,Int]):AlgebraFunction[Int] ={
-    EXPR.fold(expr) {v:F[AlgebraFunction[Int]] => feval.eval(v)}
+  def ieval[F[_]](expr:EXPR[F])(implicit f:Functor[F],feval:EVAL[F,Int],opt:Optimize[F,F]):AlgebraFunction[Int] ={
+    EXPR.fold(optimize(expr)) {v:F[AlgebraFunction[Int]] => feval.eval(v)}
   }
 
-  def deval[F[_]](expr:EXPR[F])(implicit f:Functor[F],feval:EVAL[F,Double]):AlgebraFunction[Double] ={
-    EXPR.fold(expr) {v:F[AlgebraFunction[Double]] => feval.eval(v)}
+  def deval[F[_]](expr:EXPR[F])(implicit f:Functor[F],feval:EVAL[F,Double],opt:Optimize[F,F]):AlgebraFunction[Double] ={
+    EXPR.fold(optimize(expr)) {v:F[AlgebraFunction[Double]] => feval.eval(v)}
   }
 }
