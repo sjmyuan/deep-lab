@@ -1,5 +1,6 @@
 package com.deeplab.core.types
 import EXPR._
+import Optimize._
 import cats.Functor
 import cats.data.Coproduct
 import cats.free.Inject
@@ -94,14 +95,14 @@ object GRAD{
     }
   }
 
-  def grad[F[_]:Functor:GRAD](expr:EXPR[F], x:EXPR[EXPRTYPE]):EXPR[EXPRTYPE]={
+  def grad[F[_]:Functor:GRAD](expr:EXPR[F], x:EXPR[EXPRTYPE])(implicit opt:Optimize[F,F]):EXPR[EXPRTYPE]={
     val grad= implicitly[GRAD[F]]
     val inject = implicitly[Inject[VAR,EXPRTYPE]]
 
     inject.prj(x.v).map(varX =>
-      EXPR.fold(expr) {v:F[OriginAndGrad] => grad.grad(v,varX)}._2
+      EXPR.fold(optimize(expr)) {v:F[OriginAndGrad] => grad.grad(v,varX)}._2
     ) match {
-      case Some(x) => x
+      case Some(y) => optimize(y)
       case None => throw new Exception()
     }
   }

@@ -5,6 +5,7 @@ import cats.data.Coproduct
 import cats.free.Inject
 import cats.free.Inject._
 import cats.implicits._
+import Optimize._
 
 /**
   * Created by jiaming.shang on 4/24/17.
@@ -129,76 +130,39 @@ object EXPR {
   }
 
   def dscalarVal(v: Double, name: String = ""): EXPR[EXPRTYPE] = {
-    if (v == 0)
-      inject[VAR, EXPRTYPE](ZERO(name, List()))
-    else if (v == 1)
-      inject[VAR, EXPRTYPE](ONE(name, List()))
-    else
-      inject[VAR, EXPRTYPE](DOUBLEVAL(v, List(), ""))
+    optimize(inject[VAR, EXPRTYPE](DOUBLEVAL(v, List(), "")))
   }
 
   def iscalarVal(v: Int, name: String = ""): EXPR[EXPRTYPE] = {
-    if (v == 0)
-      inject[VAR, EXPRTYPE](ZERO(name, List()))
-    else if (v == 1)
-      inject[VAR, EXPRTYPE](ONE(name, List()))
-    else
-      inject[VAR, EXPRTYPE](INTVAL(v, List(), ""))
+    optimize(inject[VAR, EXPRTYPE](INTVAL(v, List(), "")))
   }
 
-  def isZeroExpr[F[_]](v:EXPR[F])(implicit I:Inject[VAR,F]):Boolean = {
+  def isZeroExpr[F[_]](v: EXPR[F])(implicit I: Inject[VAR, F]): Boolean = {
     I.prj(v.v).map(x => x.isInstanceOf[ZERO[EXPR[F]]]).getOrElse(false)
   }
 
-  def isOneExpr[F[_]](v:EXPR[F])(implicit I:Inject[VAR,F]):Boolean = {
+  def isOneExpr[F[_]](v: EXPR[F])(implicit I: Inject[VAR, F]): Boolean = {
     I.prj(v.v).map(x => x.isInstanceOf[ONE[EXPR[F]]]).getOrElse(false)
   }
 
-  def negExpr[F[_]](v:EXPR[F])(implicit I:Inject[NEG,F],varI:Inject[VAR,F]):EXPR[F] ={
-    if(isZeroExpr(v))
-      v
-    else
-      inject[NEG,F](NEG(v))
+  def negExpr[F[_]](v: EXPR[F])(implicit I: Inject[NEG, F]): EXPR[F] = {
+    inject[NEG, F](NEG(v))
   }
 
-  def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F],varI:Inject[VAR,F]): EXPR[F] = {
-    if(isZeroExpr(lv))
-      rv
-    else if (isZeroExpr(rv))
-      lv
-    else
-      inject[ADD, F](ADD(lv, rv))
+  def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F]): EXPR[F] = {
+    inject[ADD, F](ADD(lv, rv))
   }
 
-  def subExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[SUB, F],varI:Inject[VAR,F],negI:Inject[NEG,F]): EXPR[F] = {
-    if(lv == rv)
-      inject[VAR,F](ZERO("",List()))
-    else if(isZeroExpr(lv))
-      negExpr(rv)
-    else if (isZeroExpr(rv))
-      lv
-    else
-      inject[SUB, F](SUB(lv, rv))
+  def subExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[SUB, F]): EXPR[F] = {
+    inject[SUB, F](SUB(lv, rv))
   }
 
-  def mulExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[MUL, F],varI:Inject[VAR,F]): EXPR[F] = {
-    if(isZeroExpr(lv)||isZeroExpr(rv))
-      lv
-    else if(isOneExpr(lv))
-      rv
-    else if (isOneExpr(rv))
-      lv
-    else
-      inject[MUL, F](MUL(lv, rv))
+  def mulExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[MUL, F]): EXPR[F] = {
+    inject[MUL, F](MUL(lv, rv))
   }
 
-  def divExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[DIV, F],varI:Inject[VAR,F]): EXPR[F] = {
-    if(lv == rv)
-      inject[VAR,F](ONE("",List()))
-    else if(isZeroExpr(lv)||isOneExpr(rv))
-      lv
-    else
-      inject[DIV, F](DIV(lv, rv))
+  def divExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[DIV, F]): EXPR[F] = {
+    inject[DIV, F](DIV(lv, rv))
   }
 
   def powExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[POW, F]): EXPR[F] = {
