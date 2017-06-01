@@ -14,7 +14,7 @@ trait Optimize[F[_],G[_]] {
 }
 
 object Optimize {
-  implicit def varOptimize[G[_]](implicit I:Inject[VAR,G]) = new Optimize[VAR,G] {
+  implicit def varOptimize[G[_]:Functor:PrettyPrint](implicit I:Inject[VAR,G]) = new Optimize[VAR,G] {
     override def optimize(v: VAR[EXPR[G]]): EXPR[G] = {
       v match {
         case x: INTVAL[_] if x.v.v == 0 => EXPR.inject[VAR, G](ZERO("", List()))
@@ -29,7 +29,7 @@ object Optimize {
     }
   }
 
-  implicit def addOptimize[G[_]](implicit I1:Inject[VAR,G],I2:Inject[ADD,G],I3:Inject[MUL,G]) = new Optimize[ADD,G] {
+  implicit def addOptimize[G[_]:Functor:PrettyPrint](implicit I1:Inject[VAR,G],I2:Inject[ADD,G],I3:Inject[MUL,G]) = new Optimize[ADD,G] {
     override def optimize(v: ADD[EXPR[G]]): EXPR[G] = {
       if (isZeroExpr(v.lv)) {
         v.rv
@@ -43,7 +43,7 @@ object Optimize {
     }
   }
 
-  implicit def subOptimize[G[_]](implicit I1:Inject[VAR,G],I2:Inject[SUB,G],I3:Inject[NEG,G]) = new Optimize[SUB,G] {
+  implicit def subOptimize[G[_]:Functor:PrettyPrint](implicit I1:Inject[VAR,G],I2:Inject[SUB,G],I3:Inject[NEG,G]) = new Optimize[SUB,G] {
     override def optimize(v: SUB[EXPR[G]]): EXPR[G] = {
       if (v.lv == v.rv)
         EXPR.inject[VAR, G](ZERO("", List()))
@@ -56,7 +56,7 @@ object Optimize {
     }
   }
 
-  implicit def mulOptimize[G[_]](implicit I1:Inject[VAR,G],I2:Inject[MUL,G])= new Optimize[MUL,G] {
+  implicit def mulOptimize[G[_]:Functor:PrettyPrint](implicit I1:Inject[VAR,G],I2:Inject[MUL,G])= new Optimize[MUL,G] {
     override def optimize(v: MUL[EXPR[G]]): EXPR[G] = {
       if (isZeroExpr(v.lv) || isZeroExpr(v.rv))
         EXPR.inject[VAR, G](ZERO("", List()))
@@ -69,7 +69,7 @@ object Optimize {
     }
   }
 
-  implicit def divOptimize[G[_]](implicit I1:Inject[VAR,G],I2:Inject[DIV,G]) = new Optimize[DIV,G] {
+  implicit def divOptimize[G[_]:Functor:PrettyPrint](implicit I1:Inject[VAR,G],I2:Inject[DIV,G]) = new Optimize[DIV,G] {
     override def optimize(v: DIV[EXPR[G]]): EXPR[G] = {
       if (v.lv == v.rv)
         EXPR.inject[VAR, G](ONE("", List()))
@@ -80,7 +80,7 @@ object Optimize {
     }
   }
 
-  implicit def powOptimize[G[_]](implicit I1:Inject[VAR,G],I2:Inject[POW,G]) = new Optimize[POW,G] {
+  implicit def powOptimize[G[_]:Functor:PrettyPrint](implicit I1:Inject[VAR,G],I2:Inject[POW,G]) = new Optimize[POW,G] {
     override def optimize(v: POW[EXPR[G]]): EXPR[G] = {
       if (isZeroExpr(v.lv))
         EXPR.inject[VAR, G](ZERO("", List()))
@@ -91,13 +91,13 @@ object Optimize {
     }
   }
 
-  implicit def logOptimize[G[_]](implicit I1:Inject[VAR,G],I2:Inject[LOG,G]) = new Optimize[LOG,G] {
+  implicit def logOptimize[G[_]:Functor:PrettyPrint](implicit I1:Inject[VAR,G],I2:Inject[LOG,G]) = new Optimize[LOG,G] {
     override def optimize(v: LOG[EXPR[G]]): EXPR[G] = {
       EXPR.inject[LOG, G](v)
     }
   }
 
-  implicit def expOptimzie[G[_]](implicit I1:Inject[VAR,G],I2:Inject[EXP,G]) = new Optimize[EXP,G] {
+  implicit def expOptimzie[G[_]:Functor:PrettyPrint](implicit I1:Inject[VAR,G],I2:Inject[EXP,G]) = new Optimize[EXP,G] {
     override def optimize(v: EXP[EXPR[G]]): EXPR[G] = {
       if (isZeroExpr(v.v))
         EXPR.inject[VAR, G](ONE("", List()))
@@ -106,7 +106,7 @@ object Optimize {
     }
   }
 
-  implicit def negOptimize[G[_]](implicit I1:Inject[NEG,G],I2:Inject[VAR,G]) = new Optimize[NEG,G] {
+  implicit def negOptimize[G[_]:Functor:PrettyPrint](implicit I1:Inject[NEG,G],I2:Inject[VAR,G]) = new Optimize[NEG,G] {
     override def optimize(v: NEG[EXPR[G]]): EXPR[G] = {
       if (isZeroExpr(v.v))
         v.v
@@ -115,7 +115,7 @@ object Optimize {
     }
   }
 
-  implicit def coproductOptimize[F[_], G[_],H[_], A](implicit fopt: Optimize[F,H], gopt: Optimize[G,H]) = new Optimize[Coproduct[F, G, ?],H] {
+  implicit def coproductOptimize[F[_], G[_],H[_]:Functor:PrettyPrint, A](implicit fopt: Optimize[F,H], gopt: Optimize[G,H]) = new Optimize[Coproduct[F, G, ?],H] {
     override def optimize(v: Coproduct[F, G, EXPR[H]]): EXPR[H] = {
       v.run match {
         case l: Left[F[EXPR[H]], G[EXPR[H]]] => fopt.optimize(l.a)
@@ -124,7 +124,7 @@ object Optimize {
     }
   }
 
-  def optimize[F[_]](expr: EXPR[F])(implicit f: Functor[F], fopt: Optimize[F,F]): EXPR[F] = {
+  def optimize[F[_]:PrettyPrint](expr: EXPR[F])(implicit f: Functor[F], fopt: Optimize[F,F]): EXPR[F] = {
     EXPR.fold(expr) { v: F[EXPR[F]] => fopt.optimize(v) }
   }
 }

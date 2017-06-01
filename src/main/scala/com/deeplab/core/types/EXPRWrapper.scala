@@ -2,11 +2,12 @@ package com.deeplab.core.types
 
 import cats.free.Inject
 import EXPR._
+import cats.Functor
 
 /**
   * Created by jiaming.shang on 5/7/17.
   */
-sealed case class EXPRWrapper[F[_]](v: EXPR[F]) {
+sealed case class EXPRWrapper[F[_]:Functor:PrettyPrint](v: EXPR[F]) {
   def +(o: EXPRWrapper[F])(implicit I: Inject[ADD, F], varI: Inject[VAR, F]): EXPRWrapper[F] = {
     EXPRWrapper(addExpr(v, o.v))
   }

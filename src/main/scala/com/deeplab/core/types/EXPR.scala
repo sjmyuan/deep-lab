@@ -6,11 +6,14 @@ import cats.free.Inject
 import cats.free.Inject._
 import cats.implicits._
 import Optimize._
+import PrettyPrint._
 
 /**
   * Created by jiaming.shang on 4/24/17.
   */
-case class EXPR[F[_]](v: F[EXPR[F]])
+case class EXPR[F[_]:Functor:PrettyPrint](v: F[EXPR[F]]){
+  override def toString = prettyPrint(this)
+}
 
 abstract class VAR[A](val name: String, val broadcastable: List[Boolean])
 
@@ -117,7 +120,7 @@ object EXPR {
     }
   }
 
-  def inject[G[_], F[_]](v: G[EXPR[F]])(implicit I: Inject[G, F]): EXPR[F] = {
+  def inject[G[_], F[_]:Functor:PrettyPrint](v: G[EXPR[F]])(implicit I: Inject[G, F]): EXPR[F] = {
     EXPR[F](I.inj(v))
   }
 
@@ -145,35 +148,35 @@ object EXPR {
     I.prj(v.v).map(x => x.isInstanceOf[ONE[EXPR[F]]]).getOrElse(false)
   }
 
-  def negExpr[F[_]](v: EXPR[F])(implicit I: Inject[NEG, F]): EXPR[F] = {
+  def negExpr[F[_]:Functor:PrettyPrint](v: EXPR[F])(implicit I: Inject[NEG, F]): EXPR[F] = {
     inject[NEG, F](NEG(v))
   }
 
-  def addExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F]): EXPR[F] = {
+  def addExpr[F[_]:Functor:PrettyPrint](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[ADD, F]): EXPR[F] = {
     inject[ADD, F](ADD(lv, rv))
   }
 
-  def subExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[SUB, F]): EXPR[F] = {
+  def subExpr[F[_]:Functor:PrettyPrint](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[SUB, F]): EXPR[F] = {
     inject[SUB, F](SUB(lv, rv))
   }
 
-  def mulExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[MUL, F]): EXPR[F] = {
+  def mulExpr[F[_]:Functor:PrettyPrint](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[MUL, F]): EXPR[F] = {
     inject[MUL, F](MUL(lv, rv))
   }
 
-  def divExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[DIV, F]): EXPR[F] = {
+  def divExpr[F[_]:Functor:PrettyPrint](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[DIV, F]): EXPR[F] = {
     inject[DIV, F](DIV(lv, rv))
   }
 
-  def powExpr[F[_]](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[POW, F]): EXPR[F] = {
+  def powExpr[F[_]:Functor:PrettyPrint](lv: EXPR[F], rv: EXPR[F])(implicit I: Inject[POW, F]): EXPR[F] = {
     inject[POW, F](POW(lv, rv))
   }
 
-  def logExpr[F[_]](v: EXPR[F])(implicit I: Inject[LOG, F]): EXPR[F] = {
+  def logExpr[F[_]:Functor:PrettyPrint](v: EXPR[F])(implicit I: Inject[LOG, F]): EXPR[F] = {
     inject[LOG, F](LOG(v))
   }
 
-  def expExpr[F[_]](v: EXPR[F])(implicit I: Inject[EXP, F]): EXPR[F] = {
+  def expExpr[F[_]:Functor:PrettyPrint](v: EXPR[F])(implicit I: Inject[EXP, F]): EXPR[F] = {
     inject[EXP, F](EXP(v))
   }
 
@@ -182,7 +185,7 @@ object EXPR {
     f(functorA.map(fa.v) { x => fold(x)(f) })
   }
 
-  implicit def EXPRToWrapper[F[_]](v: EXPR[F]): EXPRWrapper[F] = {
+  implicit def EXPRToWrapper[F[_]:Functor:PrettyPrint](v: EXPR[F]): EXPRWrapper[F] = {
     EXPRWrapper(v)
   }
 

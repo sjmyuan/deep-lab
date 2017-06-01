@@ -95,7 +95,7 @@ object GRAD{
     }
   }
 
-  def grad[F[_]:Functor:GRAD](expr:EXPR[F], x:EXPR[EXPRTYPE])(implicit opt:Optimize[F,F]):EXPR[EXPRTYPE]={
+  def grad[F[_]:Functor:GRAD:PrettyPrint](expr:EXPR[F], x:EXPR[EXPRTYPE])(implicit opt:Optimize[F,F]):EXPR[EXPRTYPE]={
     val grad= implicitly[GRAD[F]]
     val inject = implicitly[Inject[VAR,EXPRTYPE]]
 
