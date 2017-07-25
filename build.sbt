@@ -4,6 +4,8 @@ scalaVersion := "2.11.2"
 
 val scalazVersion = "7.1.0"
 
+scalastyleConfig := file("project/scalastyle_config.xml")
+
 libraryDependencies ++= Seq(
   "org.typelevel" %% "cats" % "0.9.0",
   "org.scalactic" %% "scalactic" % "3.0.1",
@@ -11,7 +13,6 @@ libraryDependencies ++= Seq(
   "org.scalanlp" %% "breeze" % "0.13",
   "org.scalanlp" %% "breeze-natives" % "0.13",
   "org.scalanlp" %% "breeze-viz" % "0.13"
-
 )
 
 resolvers += Resolver.sonatypeRepo("releases")
